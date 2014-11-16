@@ -8,6 +8,9 @@ namespace Motor_Controll_App
 {
     static class Program
     {
+        private string motorIp;
+        private short motorPort;
+        private short velocity;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
