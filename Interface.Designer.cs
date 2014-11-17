@@ -199,7 +199,7 @@
             this.Controls.Add(this.trackBarTime);
             this.Controls.Add(this.label1);
             this.Name = "Interface";
-            this.Text = "Form1";
+            this.Text = "UDP Motorsteuerng";
             ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).EndInit();
             this.ResumeLayout(false);
