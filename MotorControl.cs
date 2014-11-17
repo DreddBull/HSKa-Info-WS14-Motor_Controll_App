@@ -1,4 +1,11 @@
-﻿using System;
+﻿
+
+
+
+
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +17,10 @@ using System.Windows.Forms;
 
 namespace Motor_Controll_App
 {
-
-
-    class MotorControl {
+    /// <summary>
+    ///  Objekt zum Verwalten der UDP Kommunikation. Beinhaltet Parameter für IP und Port des Remote Gerätes.
+    /// </summary>
+    public class MotorControl {
         
         //Fields
         private string remoteIPString;      //Motor IP im string Format
@@ -40,10 +48,13 @@ namespace Motor_Controll_App
             }
         }
         
-        //allgemeiner Konstruktor
+        /// <summary>
+        /// Erzeugt ein MotorControl Objekt und initiiert einen UDP Clienten sowie ein IPEndPoint
+        /// </summary>
         public MotorControl() {
             //Erstellen eines Rechnerseitigen UDP Clienten
             localUdpClient = new UdpClient(lokalerPort);
+            //Erstellen eines Rechnerseitigen IPEndPoints welcher alle Befehle im Netzwerk empfängt.
             lovalIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
         }
         ~MotorControl()
