@@ -82,7 +82,7 @@
             this.textBoxIP.Name = "textBoxIP";
             this.textBoxIP.Size = new System.Drawing.Size(124, 20);
             this.textBoxIP.TabIndex = 1;
-            this.textBoxIP.Text = "192.168.11.1";
+            this.textBoxIP.Text = "192.168.11.10";
             // 
             // label3
             // 
@@ -95,30 +95,36 @@
             // 
             // buttonLeft
             // 
+            this.buttonLeft.Enabled = false;
             this.buttonLeft.Location = new System.Drawing.Point(29, 168);
             this.buttonLeft.Name = "buttonLeft";
             this.buttonLeft.Size = new System.Drawing.Size(75, 23);
             this.buttonLeft.TabIndex = 5;
             this.buttonLeft.Text = "Linksfahrt";
             this.buttonLeft.UseVisualStyleBackColor = true;
+            this.buttonLeft.Click += new System.EventHandler(this.buttonLeft_Click);
             // 
             // buttonStop
             // 
+            this.buttonStop.Enabled = false;
             this.buttonStop.Location = new System.Drawing.Point(110, 168);
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(75, 23);
             this.buttonStop.TabIndex = 6;
             this.buttonStop.Text = "Anhalten";
             this.buttonStop.UseVisualStyleBackColor = true;
+            this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
             // 
             // buttonRight
             // 
+            this.buttonRight.Enabled = false;
             this.buttonRight.Location = new System.Drawing.Point(191, 168);
             this.buttonRight.Name = "buttonRight";
             this.buttonRight.Size = new System.Drawing.Size(75, 23);
             this.buttonRight.TabIndex = 7;
             this.buttonRight.Text = "Rechtsfahrt";
             this.buttonRight.UseVisualStyleBackColor = true;
+            this.buttonRight.Click += new System.EventHandler(this.buttonRight_Click);
             // 
             // label4
             // 
@@ -131,10 +137,12 @@
             // 
             // textBoxCommand
             // 
+            this.textBoxCommand.Enabled = false;
             this.textBoxCommand.Location = new System.Drawing.Point(19, 222);
             this.textBoxCommand.Name = "textBoxCommand";
             this.textBoxCommand.Size = new System.Drawing.Size(257, 20);
             this.textBoxCommand.TabIndex = 8;
+            this.textBoxCommand.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxCommand_KeyDown);
             // 
             // buttonConnect
             // 
@@ -166,6 +174,11 @@
             this.numericUpDownPort.Name = "numericUpDownPort";
             this.numericUpDownPort.Size = new System.Drawing.Size(67, 20);
             this.numericUpDownPort.TabIndex = 2;
+            this.numericUpDownPort.Value = new decimal(new int[] {
+            4000,
+            0,
+            0,
+            0});
             // 
             // Interface
             // 
