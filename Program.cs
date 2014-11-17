@@ -8,18 +8,20 @@ namespace Motor_Controll_App
 {
     static class Program
     {
-        private string motorIp;
-        private short motorPort;
-        private short velocity;
+        static Interface MyInterface;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Interface());
+            MyInterface = new Interface();
+            Application.Run(MyInterface);
+
+
         }
     }
 }

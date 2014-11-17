@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using System.Windows.Forms;
 
 
 namespace Motor_Controll_App
@@ -14,32 +15,62 @@ namespace Motor_Controll_App
     class MotorControl {
         
         //Fields
-        private string remoteIp;
-        private short remotePort;
-        private short lokalerPort = 403; //
-        UdpClient localUdpClient;
+        private string remoteIPString;
+        private IPAddress remoteIP;
+        private int remotePort;
+        static int lokalerPort = 403; //default Port
+        private bool isConnected = false; //Verbindungsstatus
+        private UdpClient localUdpClient;
         
+        //get/set Methoden
+        public string RemoteIPstring {
+            get {
+                return remoteIPString;
+            }
+            set {
+                remoteIPString = value;
+                }
+        }
+        public int RemotePort {
+            get {
+                return remotePort;
+            }
+            set {
+                remotePort = value;
+                }
+        }
+        public bool IsConnected {
+            get
+            {
+                return isConnected;
+            }
+        }
+        
+        //allgemeiner Konstruktor
         public MotorControl() {
-            
             //Erstellen eines Rechnerseitigen UDP Clienten
             localUdpClient = new UdpClient(lokalerPort);
         }
-        public MotorControl(string motorIp, short motorPort)
+        //Konstruktor mit vorgegebener Adresse und Port
+        public MotorControl(string motorIP, int motorPort)
         {
             //Erstellen eines Rechnerseitigen UDP Clienten
             localUdpClient = new UdpClient(lokalerPort);
-            remoteIp = motorIp;
+            remoteIPString = motorIP;
             remotePort = motorPort;
+            if(IPAddress.TryParse(remoteIPString, out remoteIP)) { 
+            } else { MessageBox.Show("Fehlerhafte IP Adresse"); }
         }
 
-        public void connectMotor(string motorIp, short motorPort) {
-            try {
-                localUdpClient.Connect(remoteIp, remotePort);
-                }  
-            catch (Exception e ) {
-                          Console.WriteLine(e.ToString());
-            }
+
+        public bool parseIP() {
+            if(IPAddress.TryParse(remoteIPString, out remoteIP) == false) {
+                MessageBox.Show("Fehlerhafte IP Adresse");
+                return false;
+            } else { return true; }
         }
+
+
         public void sendCommand(string command) {
             try
             {
@@ -74,6 +105,39 @@ namespace Motor_Controll_App
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
+            }
+        }
+
+        //Verbindung zu Motor Aufbauen
+        public void connect() {
+            try
+            {
+                if (parseIP() == false) { return; } 
+                //Prüfen ob bereits eine Verbindung besteht, wenn ja wird diese getrennt und eine neue Verbindung aufgebaut.
+                if(localUdpClient.Client.Connected){
+                    localUdpClient.Client.Disconnect(true);
+                }
+                localUdpClient.Connect(remoteIP, remotePort);
+                if (localUdpClient.Client.Connected == true) {
+                    isConnected = true;
+                }
+                
+            }
+            catch (Exception e)
+            {
+                isConnected = false;
+                MessageBox.Show(e.ToString());
+            }
+        }
+        public void disconnect() {
+            try
+            {
+                localUdpClient.Client.Close();
+                isConnected = false;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
             }
         }
     }

@@ -29,18 +29,20 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
+            this.trackBarTime = new System.Windows.Forms.TrackBar();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBoxIP = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.buttonLeft = new System.Windows.Forms.Button();
+            this.buttonStop = new System.Windows.Forms.Button();
+            this.buttonRight = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.button4 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            this.textBoxCommand = new System.Windows.Forms.TextBox();
+            this.buttonConnect = new System.Windows.Forms.Button();
+            this.labelTimeValue = new System.Windows.Forms.Label();
+            this.numericUpDownPort = new System.Windows.Forms.NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -52,16 +54,17 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Verfahrzeit (in Minuten)";
             // 
-            // trackBar1
+            // trackBarTime
             // 
-            this.trackBar1.Location = new System.Drawing.Point(15, 112);
-            this.trackBar1.Maximum = 60;
-            this.trackBar1.Minimum = 1;
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(257, 45);
-            this.trackBar1.TabIndex = 1;
-            this.trackBar1.TickFrequency = 5;
-            this.trackBar1.Value = 30;
+            this.trackBarTime.Location = new System.Drawing.Point(15, 112);
+            this.trackBarTime.Maximum = 60;
+            this.trackBarTime.Minimum = 1;
+            this.trackBarTime.Name = "trackBarTime";
+            this.trackBarTime.Size = new System.Drawing.Size(170, 45);
+            this.trackBarTime.TabIndex = 4;
+            this.trackBarTime.TickFrequency = 5;
+            this.trackBarTime.Value = 30;
+            this.trackBarTime.ValueChanged += new System.EventHandler(this.trackBarTime_valueChanged);
             // 
             // label2
             // 
@@ -72,14 +75,14 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "IP-Adresse (Motor)";
             // 
-            // textBox1
+            // textBoxIP
             // 
-            this.textBox1.Location = new System.Drawing.Point(15, 26);
-            this.textBox1.MaxLength = 15;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(124, 20);
-            this.textBox1.TabIndex = 3;
-            this.textBox1.Text = "192.168.11.1";
+            this.textBoxIP.Location = new System.Drawing.Point(15, 26);
+            this.textBoxIP.MaxLength = 15;
+            this.textBoxIP.Name = "textBoxIP";
+            this.textBoxIP.Size = new System.Drawing.Size(124, 20);
+            this.textBoxIP.TabIndex = 1;
+            this.textBoxIP.Text = "192.168.11.1";
             // 
             // label3
             // 
@@ -90,41 +93,32 @@
             this.label3.TabIndex = 4;
             this.label3.Text = "Port";
             // 
-            // textBox2
+            // buttonLeft
             // 
-            this.textBox2.Location = new System.Drawing.Point(162, 26);
-            this.textBox2.MaxLength = 5;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(52, 20);
-            this.textBox2.TabIndex = 5;
-            this.textBox2.Text = "403";
+            this.buttonLeft.Location = new System.Drawing.Point(29, 168);
+            this.buttonLeft.Name = "buttonLeft";
+            this.buttonLeft.Size = new System.Drawing.Size(75, 23);
+            this.buttonLeft.TabIndex = 5;
+            this.buttonLeft.Text = "Linksfahrt";
+            this.buttonLeft.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // buttonStop
             // 
-            this.button1.Location = new System.Drawing.Point(29, 168);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 6;
-            this.button1.Text = "Linksfahrt";
-            this.button1.UseVisualStyleBackColor = true;
+            this.buttonStop.Location = new System.Drawing.Point(110, 168);
+            this.buttonStop.Name = "buttonStop";
+            this.buttonStop.Size = new System.Drawing.Size(75, 23);
+            this.buttonStop.TabIndex = 6;
+            this.buttonStop.Text = "Anhalten";
+            this.buttonStop.UseVisualStyleBackColor = true;
             // 
-            // button2
+            // buttonRight
             // 
-            this.button2.Location = new System.Drawing.Point(110, 168);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 7;
-            this.button2.Text = "Anhalten";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(191, 168);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 8;
-            this.button3.Text = "Rechtsfahrt";
-            this.button3.UseVisualStyleBackColor = true;
+            this.buttonRight.Location = new System.Drawing.Point(191, 168);
+            this.buttonRight.Name = "buttonRight";
+            this.buttonRight.Size = new System.Drawing.Size(75, 23);
+            this.buttonRight.TabIndex = 7;
+            this.buttonRight.Text = "Rechtsfahrt";
+            this.buttonRight.UseVisualStyleBackColor = true;
             // 
             // label4
             // 
@@ -135,42 +129,66 @@
             this.label4.TabIndex = 9;
             this.label4.Text = "Motorbefehle (Textkommandos)";
             // 
-            // textBox3
+            // textBoxCommand
             // 
-            this.textBox3.Location = new System.Drawing.Point(19, 222);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(257, 20);
-            this.textBox3.TabIndex = 10;
+            this.textBoxCommand.Location = new System.Drawing.Point(19, 222);
+            this.textBoxCommand.Name = "textBoxCommand";
+            this.textBoxCommand.Size = new System.Drawing.Size(257, 20);
+            this.textBoxCommand.TabIndex = 8;
             // 
-            // button4
+            // buttonConnect
             // 
-            this.button4.Location = new System.Drawing.Point(15, 53);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(68, 23);
-            this.button4.TabIndex = 11;
-            this.button4.Text = "Verbinden";
-            this.button4.UseVisualStyleBackColor = true;
+            this.buttonConnect.Location = new System.Drawing.Point(15, 53);
+            this.buttonConnect.Name = "buttonConnect";
+            this.buttonConnect.Size = new System.Drawing.Size(68, 23);
+            this.buttonConnect.TabIndex = 3;
+            this.buttonConnect.Text = "Verbinden";
+            this.buttonConnect.UseVisualStyleBackColor = true;
+            this.buttonConnect.Click += new System.EventHandler(this.buttonConnect_Click);
+            // 
+            // labelTimeValue
+            // 
+            this.labelTimeValue.AutoSize = true;
+            this.labelTimeValue.Location = new System.Drawing.Point(191, 112);
+            this.labelTimeValue.Name = "labelTimeValue";
+            this.labelTimeValue.Size = new System.Drawing.Size(38, 13);
+            this.labelTimeValue.TabIndex = 12;
+            this.labelTimeValue.Text = "30 min";
+            // 
+            // numericUpDownPort
+            // 
+            this.numericUpDownPort.Location = new System.Drawing.Point(162, 26);
+            this.numericUpDownPort.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.numericUpDownPort.Name = "numericUpDownPort";
+            this.numericUpDownPort.Size = new System.Drawing.Size(67, 20);
+            this.numericUpDownPort.TabIndex = 2;
             // 
             // Interface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 260);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.numericUpDownPort);
+            this.Controls.Add(this.labelTimeValue);
+            this.Controls.Add(this.buttonConnect);
+            this.Controls.Add(this.textBoxCommand);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.buttonRight);
+            this.Controls.Add(this.buttonStop);
+            this.Controls.Add(this.buttonLeft);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.textBoxIP);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.trackBar1);
+            this.Controls.Add(this.trackBarTime);
             this.Controls.Add(this.label1);
             this.Name = "Interface";
             this.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownPort)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -179,17 +197,18 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TrackBar trackBar1;
+        private System.Windows.Forms.TrackBar trackBarTime;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxIP;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button buttonLeft;
+        private System.Windows.Forms.Button buttonStop;
+        private System.Windows.Forms.Button buttonRight;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.TextBox textBoxCommand;
+        private System.Windows.Forms.Button buttonConnect;
+        private System.Windows.Forms.Label labelTimeValue;
+        private System.Windows.Forms.NumericUpDown numericUpDownPort;
     }
 }
 
