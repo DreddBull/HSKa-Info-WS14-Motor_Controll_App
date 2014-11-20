@@ -1,11 +1,4 @@
-﻿
-
-
-
-
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +8,8 @@ using System.Net;
 using System.Windows.Forms;
 
 
-namespace Motor_Controll_App
+
+namespace Lexium_MDrive_Test_GUI
 {
     /// <summary>
     ///  Objekt zum Verwalten der UDP Kommunikation. Beinhaltet Parameter für IP und Port des Remote Gerätes.
@@ -23,31 +17,21 @@ namespace Motor_Controll_App
     public class MotorControl {
         
         //Fields
-        private string remoteIPString;      //Motor IP im string Format
-        private IPAddress remoteIP;         //Motor IP im IPAdress Format (bereits verifiziert)
-        private int remotePort;             //Motor Port
-        static int lokalerPort = 403;       //lokaler Port für UDP Kommmunikation
-        private UdpClient localUdpClient;   //Objekt zum Handlen der UDP Verbindung
-        private IPEndPoint lovalIpEndPoint; //Objekt zum Handlen von eingehenden UDP Nachrichten
-         
-        //get/set Methoden
-        public string RemoteIPstring {
-            get {
-                return remoteIPString;
-            }
-            set {
-                remoteIPString = value;
-            }
-        }
-        public int RemotePort {
-            get {
-                return remotePort;
-            }
-            set {
-                remotePort = value;
-            }
-        }
-        
+        private string remoteIPString;              //Motor IP im string Format
+        private IPAddress remoteIP;                 //Motor IP im IPAdress Format (bereits verifiziert)
+        private int remotePort;                     //Motor Port
+        private UdpClient localUdpClient;           //Objekt zum Handlen der UDP Verbindung
+        private IPEndPoint localIPEndPoint;         //Objekt zum Handlen von eingehenden UDP Nachrichten
+        //Motorkonstanten
+        private static int lokalerPort = 403;               //lokaler Port für UDP Kommmunikation
+        private static float radius1 = (float)10.35;        //Radius des Zahnrades am Motorschaft
+        private static float radius2 = (float)40.75;        //Radius des großen Zahnrades mit v = v Zahnrad-Motorschaft 
+        private static float radius3 = (float)20.37125;     //Radius des kleinen Zahnrades, welches sich mit dem großen Zahnrad dreht
+        private static int stepsPerRev = 51200;             //Schritte Pro Umdrehung
+
+
+
+        //Kon-/Destruktor
         /// <summary>
         /// Erzeugt ein MotorControl Objekt und initiiert einen UDP Clienten sowie ein IPEndPoint
         /// </summary>
@@ -55,29 +39,22 @@ namespace Motor_Controll_App
             //Erstellen eines Rechnerseitigen UDP Clienten
             localUdpClient = new UdpClient(lokalerPort);
             //Erstellen eines Rechnerseitigen IPEndPoints welcher alle Befehle im Netzwerk empfängt.
-            lovalIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            localIPEndPoint = new IPEndPoint(IPAddress.Any, 0);
         }
+        /// <summary>
+        /// Zerstört das MotorControl Objekt.
+        /// </summary>
         ~MotorControl()
         {
             //Erstellen eines Rechnerseitigen UDP Clienten
             localUdpClient.Close();
         }
 
-        //Konstruktor mit vorgegebener Adresse und Port
-        /*
-        public MotorControl(string motorIP, int motorPort)
-        {
-            //Erstellen eines Rechnerseitigen UDP Clienten
-            localUdpClient = new UdpClient(lokalerPort);
-            remoteIPString = motorIP;
-            remotePort = motorPort;
-            if(IPAddress.TryParse(remoteIPString, out remoteIP)) { 
-            } else { MessageBox.Show("Fehlerhafte IP Adresse"); }
-        }
-         */
-
-        //Prüft den string "remoteIPString" ob dies eine valide IP Adresse ist, setzt diese anschließend als IPAddress Objekt "remoteIP"
-        public bool parseIP() {
+        //Private Methoden
+        /// <summary>
+        ///Prüft den string "remoteIPString" im MotorControl Objekt ob dies eine valide IP Adresse ist, setzt diese anschließend als IPAddress Objekt "remoteIP".
+        /// <summary>
+        private bool parseIP() {
             if(IPAddress.TryParse(remoteIPString, out remoteIP) == false) {
                 MessageBox.Show("Fehlerhafte IP Adresse");
                 return false;
@@ -87,47 +64,47 @@ namespace Motor_Controll_App
             }
         }
 
-        //Sendet einen Befehl an den Motor
+        private uint calcStepSpeed(uint velocitySled) {
+            float revPerS = (float)velocitySled * ( radius2 / ( radius1 * radius3 )) / (float)60; //Motorumdrehungen pro Sekunde
+            uint stepSpeed = (uint)(revPerS * (float)stepsPerRev);
+            return stepSpeed;
+        }
+
+        //Öffentliche Methoden
+        /// <summary>
+        /// Sendet den übergebenen String an den verbundenen Motor.
+        /// </summary>
+        /// <param name="command">MCode Befehl welcher an den Lexium MDrive Motor übertragen werden soll. z.B.:SL 50000 (vor Übermittlung wird en CR "\r" angehängt.</param>
         public void sendCommand(string command) {
             try
             {
                 // Convert command to Bytes
-                Byte[] sendBytes = Encoding.ASCII.GetBytes(command);
-
+                Byte[] sendBytes = Encoding.ASCII.GetBytes(command + "\r");
                 localUdpClient.Send(sendBytes, sendBytes.Length);
-
-                /*
-                // Sends a message to a different host using optional hostname and port parameters.
-                UdpClient udpClientB = new UdpClient();
-                udpClientB.Send(sendBytes, sendBytes.Length, "AlternateHostMachineName", 11000);
-
-                //IPEndPoint object will allow us to read datagrams sent from any source.
-                IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-
-                // Blocks until a message returns on this socket from a remote host.
-                Byte[] receiveBytes = localUdpClient.Receive(ref RemoteIpEndPoint);
-                string returnData = Encoding.ASCII.GetString(receiveBytes);
-
-                // Uses the IPEndPoint object to determine which of these two hosts responded.
-                Console.WriteLine("This is the message you received " +
-                                            returnData.ToString());
-                Console.WriteLine("This message was sent from " +
-                                            RemoteIpEndPoint.Address.ToString() +
-                                            " on their port number " +
-                                            RemoteIpEndPoint.Port.ToString());
-
-                localUdpClient.Close();
-                udpClientB.Close();
-                */
-
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                MessageBox.Show(e.ToString());
+            }
+        }
+        public void sendEndSign()
+        {
+            try
+            {
+                Byte[] endByte = Encoding.ASCII.GetBytes("\r");
+                localUdpClient.Send(endByte, endByte.Length);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
             }
         }
 
-        //Verbindung zu Motor Aufbauen
+        /// <summary>
+        /// Stellt eine UDP Verbindung zum Motor her.
+        /// </summary>
+        /// <param name="motorIP">Hier wird die IP Adresse des Lexium MDrive Motors als string eingegeben.</param>
+        /// <param name="motorPort">Hier wird der Port des Lexium MDrive Motors als int eigegeben. (MCode UDP/TCP: 503)</param>
         public void connect(string motorIP, int motorPort) {
             try
             {
@@ -144,17 +121,51 @@ namespace Motor_Controll_App
                 MessageBox.Show(e.ToString());
             }
         }
-        public void disconnect() {
-            try
-            {
-                localUdpClient.Client.Disconnect(false);
-                //localUdpClient.Client.Close();
+        
+        public void driveLeft(uint velocity) {
+            sendCommand("SL " + Convert.ToString(calcStepSpeed(velocity))); //Sends Command
+            //sendEndSign();
+        }
+
+        public void driveRight(uint velocity) {
+            sendCommand("SL -" + Convert.ToString(calcStepSpeed(velocity))); //Sends Command
+            //sendEndSign();
+        }
+        public void driveStop()
+        {
+            sendCommand("SL 0"); //Sends Command
+            //sendEndSign();
+        }
+        
+        
+        
+        //get/set Methoden
+        /// <summary>
+        ///  Setzen der IP des MotorControl Objektes.
+        /// </summary>
+        public string RemoteIPString {
+            get {
+                return remoteIPString;
             }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString());
+            set {
+                remoteIPString = value;
+                parseIP();
             }
         }
+        /// <summary>
+        ///  Setzen des Ports des MotorControl Objektes.
+        /// </summary>
+        public int RemotePort {
+            get {
+                return remotePort;
+            }
+            set {
+                remotePort = value;
+            }
+        }
+        
+    
+    
     }
 
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Motor_Controll_App
+namespace Lexium_MDrive_Test_GUI
 {
     static class Program
     {

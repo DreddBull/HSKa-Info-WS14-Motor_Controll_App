@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Motor Controll App")]
+[assembly: AssemblyTitle("Lexium MDrive Test GUI")]
 [assembly: AssemblyDescription("Applikation zur UDP Kommunikation mit einem Mdrive 23 Schrittmotor")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HSKa")]
-[assembly: AssemblyProduct("Motor Controll App")]
+[assembly: AssemblyProduct("Lexium MDrive Test GUI")]
 [assembly: AssemblyCopyright("Copyright © 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
