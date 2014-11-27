@@ -12,18 +12,18 @@ namespace Lexium_MDrive_Test_GUI
 {
     public partial class Interface : Form
     {
-
-        MotorControl myMotor;
-        uint speedFast = 4000; //mm/min
-        uint speedMedium = 1500; //mm/min
-        uint speedSlow = 100; //mm/min
+        //Variablen
+        MotorControl myMotor;       //Objekt zum ansteuern des Motors
+        uint speedFast = 4000;      //Geschwindigkeit in mm/min
+        uint speedMedium = 1500;    //Geschwindigkeit in mm/min
+        uint speedSlow = 100;       //Geschwindigkeit in mm/min
+        
         //Konstruktor
         public Interface() {
             InitializeComponent();
         }
 
         //Methoden für Button Clicks
-
         //Verbindungsknopf
         private void buttonConnect_Click(object sender, EventArgs e) {
             //Prüfen ob bereits ein Objekt erstellt wurde
@@ -42,36 +42,40 @@ namespace Lexium_MDrive_Test_GUI
             buttonFastRight.Enabled = true;
             textBoxCommand.Enabled = true;
         }
+
         //Linkslauf
         private void buttonLeft_Click(object sender, EventArgs e)
         {
             myMotor.driveLeft((uint)trackBarSpeed.Value);
         }
+
         //Rechtslauf
         private void buttonRight_Click(object sender, EventArgs e)
         {
             myMotor.driveRight((uint)trackBarSpeed.Value);
         }
+
         //Halt
         private void buttonStop_Click(object sender, EventArgs e)
         {
             myMotor.driveStop();
-            //myMotor.sendEndSign();
         }
         
+        //Event zum Aktualisieren des Anzeigewertes für Geschwindigkeit. Bei Wertänderung des Sliders wird der Text aktualisiert.
         private void trackBarTime_valueChanged(object sender, EventArgs e) {
             labelTimeValue.Text = Convert.ToString(trackBarSpeed.Value) + " mm/min";
         }
 
+        //Text-Box Eingabe
         private void textBoxCommand_KeyDown(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)13)
             {
                 myMotor.sendCommand(textBoxCommand.Text);
-                //myMotor.sendEndSign();
                 textBoxCommand.Clear();
             }
         }
+
         //Buttons für Linksfahrt
         //Schnell
         private void buttonFastLeft_MouseDown(object sender, MouseEventArgs e)

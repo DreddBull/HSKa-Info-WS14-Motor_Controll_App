@@ -17,13 +17,15 @@ namespace Lexium_MDrive_Test_GUI
     public class MotorControl {
         
         //Fields
-        private string remoteIPString;              //Motor IP im string Format
-        private IPAddress remoteIP;                 //Motor IP im IPAdress Format (bereits verifiziert)
-        private int remotePort;                     //Motor Port
-        private UdpClient localUdpClient;           //Objekt zum Handlen der UDP Verbindung
-        private IPEndPoint localIPEndPoint;         //Objekt zum Handlen von eingehenden UDP Nachrichten
+        private string remoteIPString;                      //Motor IP im string Format
+        private IPAddress remoteIP;                         //Motor IP im IPAdress Format (bereits verifiziert)
+        private int remotePort;                             //Motor Port
+        private UdpClient localUdpClient;                   //Objekt zum Handlen der UDP Verbindung
+        private IPEndPoint localIPEndPoint;                 //Objekt zum Handlen von eingehenden UDP Nachrichten
         //Motorkonstanten
-        private static int lokalerPort = 403;               //lokaler Port für UDP Kommmunikation
+        private static string configPort2 = "Is = 2,2,1";   //Konfigurationsbefehl um Input2 in Anschlag-Rechts zu setzen (MCode Anleitung für mehr Informationen)
+        private static string configPort3 = "Is = 3,3,1";   //Konfigurationsbefehl um Input2 in Anschlag-Links zu setzen (MCode Anleitung für mehr Informationen)
+        private static int localPort = 403;                 //lokaler Port für UDP Kommmunikation
         private static float radius1 = (float)10.35;        //Radius des Zahnrades am Motorschaft
         private static float radius2 = (float)40.75;        //Radius des großen Zahnrades mit v = v Zahnrad-Motorschaft 
         private static float radius3 = (float)20.37125;     //Radius des kleinen Zahnrades, welches sich mit dem großen Zahnrad dreht
@@ -31,16 +33,16 @@ namespace Lexium_MDrive_Test_GUI
 
 
 
-        //Kon-/Destruktor
         /// <summary>
         /// Erzeugt ein MotorControl Objekt und initiiert einen UDP Clienten sowie ein IPEndPoint
         /// </summary>
         public MotorControl() {
             //Erstellen eines Rechnerseitigen UDP Clienten
-            localUdpClient = new UdpClient(lokalerPort);
+            localUdpClient = new UdpClient(localPort);
             //Erstellen eines Rechnerseitigen IPEndPoints welcher alle Befehle im Netzwerk empfängt.
             localIPEndPoint = new IPEndPoint(IPAddress.Any, 0);
         }
+
         /// <summary>
         /// Zerstört das MotorControl Objekt.
         /// </summary>
@@ -52,11 +54,10 @@ namespace Lexium_MDrive_Test_GUI
 
         //Private Methoden
         /// <summary>
-        ///Prüft den string "remoteIPString" im MotorControl Objekt ob dies eine valide IP Adresse ist, setzt diese anschließend als IPAddress Objekt "remoteIP".
+        ///Prüft den string "remoteIPString" im MotorControl Objekt ob dies eine valide IP Adresse ist, setzt diese anschließend als IPAddress Objekt "remoteIP". Falls die IP ungültig ist, gibt die Funktion ein "false" wieder.
         /// <summary>
         private bool parseIP() {
             if(IPAddress.TryParse(remoteIPString, out remoteIP) == false) {
-                MessageBox.Show("Fehlerhafte IP Adresse");
                 return false;
             } 
             else { 
@@ -64,10 +65,23 @@ namespace Lexium_MDrive_Test_GUI
             }
         }
 
+        /// <summary>
+        ///  Berechnet aus der Geschwindigkeit in mm/min die Schritte/sek mittels der in der Konfiguration angegebenen Übersetzung
+        /// </summary>
+        /// <param name="velocitySled">Hier wird die Geschwindigkeit in mm/min für den Kameraschlitten angegeben.</param>
         private uint calcStepSpeed(uint velocitySled) {
-            float revPerS = (float)velocitySled * ( radius2 / ( radius1 * radius3 )) / (float)60; //Motorumdrehungen pro Sekunde
+            float revPerS = (float)velocitySled * ( radius2 / ( radius1 * radius3 )) / (float)60;
             uint stepSpeed = (uint)(revPerS * (float)stepsPerRev);
             return stepSpeed;
+        }
+
+        /// <summary>
+        /// Sendet die Initialen Konfigurationswerte
+        /// </summary>
+        private void sendConfig() {
+            sendCommand(configPort2);
+            sendCommand(configPort3);
+            sendEndSign(); //Abschließendes Endzeichen
         }
 
         //Öffentliche Methoden
@@ -87,6 +101,10 @@ namespace Lexium_MDrive_Test_GUI
                 MessageBox.Show(e.ToString());
             }
         }
+
+        /// <summary>
+        ///  Sendet das Ende Zeichen bzw. Carry-Return "\r"
+        /// </summary>
         public void sendEndSign()
         {
             try
@@ -115,26 +133,37 @@ namespace Lexium_MDrive_Test_GUI
                     return; 
                 } 
                 localUdpClient.Connect(remoteIP, remotePort);
+                sendConfig();
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
             }
         }
-        
-        public void driveLeft(uint velocity) {
+
+        /// <summary>
+        /// Lässt den motor mit der eingegebenen Geschwindigkeit nach Links drehen.
+        /// </summary>
+        /// <param name="velocity">Hier wird die gewünschte Verfahrgeschwindigkeit in mm/min eingegeben.</param>
+        public void driveLeft(uint velocity)
+        {
             sendCommand("SL " + Convert.ToString(calcStepSpeed(velocity))); //Sends Command
-            //sendEndSign();
         }
 
+        /// <summary>
+        /// Lässt den motor mit der eingegebenen Geschwindigkeit nach Rechts drehen.
+        /// </summary>
+        /// <param name="velocity">Hier wird die gewünschte Verfahrgeschwindigkeit in mm/min eingegeben.</param>
         public void driveRight(uint velocity) {
-            sendCommand("SL -" + Convert.ToString(calcStepSpeed(velocity))); //Sends Command
-            //sendEndSign();
+            sendCommand("SL -" + Convert.ToString(calcStepSpeed(velocity)));
         }
+
+        /// <summary>
+        /// Stoppt die Motorbewegung
+        /// </summary>
         public void driveStop()
         {
-            sendCommand("SL 0"); //Sends Command
-            //sendEndSign();
+            sendCommand("SL 0");
         }
         
         
