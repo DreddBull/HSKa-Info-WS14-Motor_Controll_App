@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
 using System.Windows.Forms;
+using System.Net.NetworkInformation;
 
 
 
@@ -22,6 +23,8 @@ namespace Lexium_MDrive_Test_GUI
         private int remotePort;                             //Motor Port
         private UdpClient localUdpClient;                   //Objekt zum Handlen der UDP Verbindung
         private IPEndPoint localIPEndPoint;                 //Objekt zum Handlen von eingehenden UDP Nachrichten
+        private Ping pinger;                                //Objekt zum Prüfen ob der Motor erreichbar ist
+        private PingReply reply;                            //Objekt zum Auswerten der Ping-Rückmeldung
         //Motorkonstanten
         private static string configPort2 = "Is = 2,2,1";   //Konfigurationsbefehl um Input2 in Anschlag-Rechts zu setzen (MCode Anleitung für mehr Informationen)
         private static string configPort3 = "Is = 3,3,1";   //Konfigurationsbefehl um Input2 in Anschlag-Links zu setzen (MCode Anleitung für mehr Informationen)
@@ -41,6 +44,8 @@ namespace Lexium_MDrive_Test_GUI
             localUdpClient = new UdpClient(localPort);
             //Erstellen eines Rechnerseitigen IPEndPoints welcher alle Befehle im Netzwerk empfängt.
             localIPEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            //Erstellen des Pinger Objektes
+            pinger = new Ping();
         }
 
         /// <summary>
@@ -80,8 +85,9 @@ namespace Lexium_MDrive_Test_GUI
         /// </summary>
         private void sendConfig() {
             sendCommand(configPort2);
+            sendEndSign();
             sendCommand(configPort3);
-            sendEndSign(); //Abschließendes Endzeichen
+            sendEndSign();
         }
 
         //Öffentliche Methoden
@@ -123,23 +129,50 @@ namespace Lexium_MDrive_Test_GUI
         /// </summary>
         /// <param name="motorIP">Hier wird die IP Adresse des Lexium MDrive Motors als string eingegeben.</param>
         /// <param name="motorPort">Hier wird der Port des Lexium MDrive Motors als int eigegeben. (MCode UDP/TCP: 503)</param>
-        public void connect(string motorIP, int motorPort) {
+        public bool connect(string motorIP, int motorPort) {
             try
             {
                 remoteIPString = motorIP;
                 remotePort = motorPort;
-                if (parseIP() == false) {
-                    MessageBox.Show("Fehlerhafte IP Adresse");
-                    return; 
-                } 
-                localUdpClient.Connect(remoteIP, remotePort);
-                sendConfig();
+                if (parseIP() == false) {                           //Prüfen ob IP korrekt ist
+                    MessageBox.Show("Fehlerhafte IP Adresse.");
+                    return false; 
+                }
+                if (checkConnection() == true)                      //Prüfen ob Motor erreichbar ist
+                {
+                    localUdpClient.Connect(remoteIP, remotePort);   //Baut "Verbindung" auf
+                    sendConfig();                                   //Übertragen der Konfiguration
+                    return true;
+                } else { 
+                    return false; 
+                }
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
+                return false;
             }
         }
+
+        /// <summary>
+        /// Prüft ob Motor noch erreichbar ist.
+        /// </summary>
+        public bool checkConnection() {
+            try {
+                reply = pinger.Send(remoteIP);                   //Senden einer Anfrage und speichern der Antwort
+                if (reply.Status == IPStatus.Success){          //Prüfen ob Motor antwortet bzw. erreichbar ist  
+                    return true;
+                } else {
+                    MessageBox.Show("Motor nicht erreichbar.\nFehler: " + reply.Status.ToString());
+                    return false; 
+                }
+            }
+            catch (PingException e) {
+                MessageBox.Show("Ping Fehler:" + e.ToString());
+                return false;
+            }
+        }
+
 
         /// <summary>
         /// Lässt den motor mit der eingegebenen Geschwindigkeit nach Links drehen.
@@ -164,10 +197,8 @@ namespace Lexium_MDrive_Test_GUI
         public void driveStop()
         {
             sendCommand("SL 0");
-        }
-        
-        
-        
+        }   
+         
         //get/set Methoden
         /// <summary>
         ///  Setzen der IP des MotorControl Objektes.
@@ -192,9 +223,6 @@ namespace Lexium_MDrive_Test_GUI
                 remotePort = value;
             }
         }
-        
-    
-    
     }
 
 }

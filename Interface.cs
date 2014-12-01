@@ -21,16 +21,12 @@ namespace Lexium_MDrive_Test_GUI
         //Konstruktor
         public Interface() {
             InitializeComponent();
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
         }
 
-        //Methoden für Button Clicks
-        //Verbindungsknopf
-        private void buttonConnect_Click(object sender, EventArgs e) {
-            //Prüfen ob bereits ein Objekt erstellt wurde
-            if (myMotor == null) {
-                myMotor = new MotorControl();
-            }
-            myMotor.connect(textBoxIP.Text, Convert.ToInt32(numericUpDownPort.Value));
+        //Buttons aktivieren
+        private void enableButtons()
+        {
             buttonLeft.Enabled = true;
             buttonRight.Enabled = true;
             buttonStop.Enabled = true;
@@ -43,21 +39,63 @@ namespace Lexium_MDrive_Test_GUI
             textBoxCommand.Enabled = true;
         }
 
-        //Linkslauf
-        private void buttonLeft_Click(object sender, EventArgs e)
+        //Buttons deaktivieren
+        private void disableButtons()
         {
+            buttonLeft.Enabled = false;
+            buttonRight.Enabled = false;
+            buttonStop.Enabled = false;
+            buttonSlowLeft.Enabled = false;
+            buttonSlowRight.Enabled = false;
+            buttonMediumLeft.Enabled = false;
+            buttonMediumRight.Enabled = false;
+            buttonFastLeft.Enabled = false;
+            buttonFastRight.Enabled = false;
+            textBoxCommand.Enabled = false;
+        }
+        //Verbindung aufbauen
+        private void connect() {
+            disableButtons();
+            //Prüfen ob bereits ein Objekt erstellt wurde
+            if (myMotor == null)
+            {
+                myMotor = new MotorControl();
+            }
+            if (myMotor.connect(textBoxIP.Text, Convert.ToInt32(numericUpDownPort.Value)) == true)
+            {
+                enableButtons();
+            }
+            else
+            {
+                disableButtons();
+            }
+        }
+        //Methoden für Events
+        //Verbindungsknopf
+        private void buttonConnect_Click(object sender, EventArgs e) {
+                connect();
+        }
+        //Text-Box Eingabe
+        private void textBoxIP_KeyDown(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13)
+            {
+                connect();
+            }
+        }
+
+        //Linkslauf
+        private void buttonLeft_Click(object sender, EventArgs e) {
             myMotor.driveLeft((uint)trackBarSpeed.Value);
         }
 
         //Rechtslauf
-        private void buttonRight_Click(object sender, EventArgs e)
-        {
+        private void buttonRight_Click(object sender, EventArgs e) {
             myMotor.driveRight((uint)trackBarSpeed.Value);
         }
 
         //Halt
-        private void buttonStop_Click(object sender, EventArgs e)
-        {
+        private void buttonStop_Click(object sender, EventArgs e) {
             myMotor.driveStop();
         }
         
@@ -69,7 +107,7 @@ namespace Lexium_MDrive_Test_GUI
         //Text-Box Eingabe
         private void textBoxCommand_KeyDown(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)13)
+            if (e.KeyChar == (char)13 && textBoxIP.Text.Length > 0)
             {
                 myMotor.sendCommand(textBoxCommand.Text);
                 textBoxCommand.Clear();
@@ -78,54 +116,36 @@ namespace Lexium_MDrive_Test_GUI
 
         //Buttons für Linksfahrt
         //Schnell
-        private void buttonFastLeft_MouseDown(object sender, MouseEventArgs e)
-        {
+        private void buttonFastLeft_MouseDown(object sender, MouseEventArgs e) {
             myMotor.driveLeft(speedFast);
         }
         //Medium
-        private void buttonMediumLeft_MouseDown(object sender, MouseEventArgs e)
-        {
+        private void buttonMediumLeft_MouseDown(object sender, MouseEventArgs e) {
             myMotor.driveLeft(speedMedium);
         }
         //Langsam
-        private void buttonSlowLeft_MouseDown(object sender, MouseEventArgs e)
-        {
+        private void buttonSlowLeft_MouseDown(object sender, MouseEventArgs e) {
             myMotor.driveLeft(speedSlow);
         }
         //Buttons für Rechtsfahrt
         //Schnell
-        private void buttonFastRight_MouseDown(object sender, MouseEventArgs e)
-        {
+        private void buttonFastRight_MouseDown(object sender, MouseEventArgs e) {
             myMotor.driveRight(speedFast);
         }
         //Medium
-        private void buttonMediumRight_MouseDown(object sender, MouseEventArgs e)
-        {
+        private void buttonMediumRight_MouseDown(object sender, MouseEventArgs e) {
             myMotor.driveRight(speedMedium);
         }
         //Langsam
-        private void buttonSlowRight_MouseDown(object sender, MouseEventArgs e)
-        {
+        private void buttonSlowRight_MouseDown(object sender, MouseEventArgs e) {
             myMotor.driveRight(speedSlow);
         }
         //Button für Stopp
-        private void button_Release(object sender, MouseEventArgs e)
-        {
+        private void button_Release(object sender, MouseEventArgs e) {
             myMotor.driveStop();
         }
 
-        private void numericUpDownPort_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toolStripStatusLabel1_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start("http://info.hit-karlsruhe.de/info-ws14/Verfahrschiene_Kamera-Koordination/");
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
+        private void toolStripLabel_Click(object sender, EventArgs e) {
             System.Diagnostics.Process.Start("http://info.hit-karlsruhe.de/info-ws14/Verfahrschiene_Kamera-Koordination/");
         }
     }
