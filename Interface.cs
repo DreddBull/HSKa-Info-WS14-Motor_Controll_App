@@ -16,7 +16,7 @@ namespace Lexium_MDrive_Test_GUI
         MotorControl myMotor;       //Objekt zum ansteuern des Motors
         uint speedFast = 4000;      //Geschwindigkeit in mm/min
         uint speedMedium = 1500;    //Geschwindigkeit in mm/min
-        uint speedSlow = 100;       //Geschwindigkeit in mm/min
+        uint speedSlow = 500;       //Geschwindigkeit in mm/min
         
         //Konstruktor
         public Interface() {

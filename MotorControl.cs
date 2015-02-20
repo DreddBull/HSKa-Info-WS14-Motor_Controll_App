@@ -25,9 +25,11 @@ namespace Lexium_MDrive_Test_GUI
         private IPEndPoint localIPEndPoint;                 //Objekt zum Handlen von eingehenden UDP Nachrichten
         private Ping pinger;                                //Objekt zum Prüfen ob der Motor erreichbar ist
         private PingReply reply;                            //Objekt zum Auswerten der Ping-Rückmeldung
+        
         //Motorkonstanten
-        private static string configPort2 = "Is = 2,2,1";   //Konfigurationsbefehl um Input2 in Anschlag-Rechts zu setzen (MCode Anleitung für mehr Informationen)
-        private static string configPort3 = "Is = 3,3,1";   //Konfigurationsbefehl um Input2 in Anschlag-Links zu setzen (MCode Anleitung für mehr Informationen)
+        private static string configPort2 = "Is=2,2,1";     //Konfigurationsbefehl um Input2 in Anschlag-Rechts zu setzen (MCode Anleitung für mehr Informationen)
+        private static string configPort3 = "Is=3,3,1";     //Konfigurationsbefehl um Input3 in Anschlag-Links zu setzen (MCode Anleitung für mehr Informationen)
+        private static string configCurrent = "Rc=75";      //Konfigurationsbefehl um den Betriebsstrom auf 75% zu begrenzen
         private static int localPort = 403;                 //lokaler Port für UDP Kommmunikation
         private static float radius1 = (float)10.35;        //Radius des Zahnrades am Motorschaft
         private static float radius2 = (float)40.75;        //Radius des großen Zahnrades mit v = v Zahnrad-Motorschaft 
@@ -51,8 +53,7 @@ namespace Lexium_MDrive_Test_GUI
         /// <summary>
         /// Zerstört das MotorControl Objekt.
         /// </summary>
-        ~MotorControl()
-        {
+        ~MotorControl() {
             //Erstellen eines Rechnerseitigen UDP Clienten
             localUdpClient.Close();
         }
@@ -75,9 +76,8 @@ namespace Lexium_MDrive_Test_GUI
         /// </summary>
         /// <param name="velocitySled">Hier wird die Geschwindigkeit in mm/min für den Kameraschlitten angegeben.</param>
         private uint calcStepSpeed(uint velocitySled) {
-            float revPerS = (float)velocitySled * ( radius2 / ( radius1 * radius3 )) / (float)60;
-            uint stepSpeed = (uint)(revPerS * (float)stepsPerRev);
-            return stepSpeed;
+            float stepSpeed = (((float)velocitySled / (float)60) * radius2 * (float)stepsPerRev) / (2 * (float)Math.PI * radius1 * radius3);
+            return (uint)stepSpeed; //Ausgabe Schritte/sekunde als Ganzzahl
         }
 
         /// <summary>
@@ -85,9 +85,10 @@ namespace Lexium_MDrive_Test_GUI
         /// </summary>
         private void sendConfig() {
             sendCommand(configPort2);
-            sendEndSign();
+            System.Threading.Thread.Sleep(10); //Eine unterbrechung zwischen den Befehlen hat eine stabilere Übertragung herbeigeführt
             sendCommand(configPort3);
-            sendEndSign();
+            System.Threading.Thread.Sleep(10);
+            sendCommand(configCurrent);
         }
 
         //Öffentliche Methoden
@@ -96,14 +97,12 @@ namespace Lexium_MDrive_Test_GUI
         /// </summary>
         /// <param name="command">MCode Befehl welcher an den Lexium MDrive Motor übertragen werden soll. z.B.:SL 50000 (vor Übermittlung wird en CR "\r" angehängt.</param>
         public void sendCommand(string command) {
-            try
-            {
+            try {
                 // Convert command to Bytes
                 Byte[] sendBytes = Encoding.ASCII.GetBytes(command + "\r");
                 localUdpClient.Send(sendBytes, sendBytes.Length);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 MessageBox.Show(e.ToString());
             }
         }
@@ -130,16 +129,14 @@ namespace Lexium_MDrive_Test_GUI
         /// <param name="motorIP">Hier wird die IP Adresse des Lexium MDrive Motors als string eingegeben.</param>
         /// <param name="motorPort">Hier wird der Port des Lexium MDrive Motors als int eigegeben. (MCode UDP/TCP: 503)</param>
         public bool connect(string motorIP, int motorPort) {
-            try
-            {
+            try {
                 remoteIPString = motorIP;
                 remotePort = motorPort;
                 if (parseIP() == false) {                           //Prüfen ob IP korrekt ist
                     MessageBox.Show("Fehlerhafte IP Adresse.");
                     return false; 
                 }
-                if (checkConnection() == true)                      //Prüfen ob Motor erreichbar ist
-                {
+                if (checkConnection() == true) {                    //Prüfen ob Motor erreichbar ist
                     localUdpClient.Connect(remoteIP, remotePort);   //Baut "Verbindung" auf
                     sendConfig();                                   //Übertragen der Konfiguration
                     return true;
@@ -147,8 +144,7 @@ namespace Lexium_MDrive_Test_GUI
                     return false; 
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 MessageBox.Show(e.ToString());
                 return false;
             }
@@ -212,6 +208,7 @@ namespace Lexium_MDrive_Test_GUI
                 parseIP();
             }
         }
+
         /// <summary>
         ///  Setzen des Ports des MotorControl Objektes.
         /// </summary>
